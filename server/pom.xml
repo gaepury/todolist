@@ -20,6 +20,23 @@
 	</properties>
 	<dependencies>
 		<dependency>
+			<groupId>org.springframework</groupId> <!-- spring-context 의존성 -->
+			<artifactId>spring-context</artifactId>
+			<version>4.3.7.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId> <!-- JUnit 의존성 -->
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId> <!-- Slfj + Logback 조합을 사용 ,ogback-classic에 logback-core, slf4j-api가 의존성이 
+				있기 때문 -->
+			<artifactId>logback-classic</artifactId>
+			<version>1.1.8</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
