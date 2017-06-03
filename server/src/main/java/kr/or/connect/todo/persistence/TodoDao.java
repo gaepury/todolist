@@ -25,7 +25,7 @@ public class TodoDao {
 
 	public TodoDao(DataSource dataSource) {
 		this.jdbc = new NamedParameterJdbcTemplate(dataSource);
-		this.insertAction = new SimpleJdbcInsert(dataSource).withTableName("todo").usingGeneratedKeyColumns("id");
+		this.insertAction = new SimpleJdbcInsert(dataSource).withTableName("todo").usingColumns("todo").usingGeneratedKeyColumns("id"); //usingColumns를 쓰는 이유는?
 	}
 
 	// 할일 갯수

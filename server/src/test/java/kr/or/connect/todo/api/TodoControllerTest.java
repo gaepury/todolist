@@ -1,4 +1,4 @@
-package kr.or.connect.todo.presentation;
+package kr.or.connect.todo.api;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -38,10 +38,10 @@ public class TodoControllerTest {
 
 	@Test
 	public void shouldCreate() throws Exception {
-		String requestBody = "{\"todo\":\"spring 공부\", \"completed\": 0}";
+		String requestBody = "{\"todo\":\"spring 공부\", \"completed\": 0 }";
 
 		mvc.perform(
-			post("/api/Todos/")
+			post("/api/todos/")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestBody)
 			)
@@ -52,10 +52,10 @@ public class TodoControllerTest {
 	}
 	@Test
 	public void shouldUpdate() throws Exception {
-		String requestBody = "{\"todo\":\"spring 공부\", \"completed\":0}";
+		String requestBody = "{\"todo\":\"spring 공부\", \"completed\":\"0\"}";
 
 		mvc.perform(
-			put("/api/Todos/1")
+			put("/api/todos/4")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestBody)
 			)
@@ -65,7 +65,7 @@ public class TodoControllerTest {
 	@Test
 	public void shouldDelete() throws Exception {
 		mvc.perform(
-			delete("/api/Todos/1")
+			delete("/api/todos/4")
 				.contentType(MediaType.APPLICATION_JSON)
 		)
 		.andExpect(status().isNoContent());
