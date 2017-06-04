@@ -18,8 +18,7 @@
                     type: 'POST',
                     data: JSON.stringify({ "todo": todo }), //DB에서 completed 기본값 0, date 기본값 현재 시간
                     success: function(result) {
-                        // alert(result.id);
-                        //complete탭에서 추가할때 생기는걸 방지하기 위해 all페이지로 이동후 추가되게 함
+
                         loadTodoList();
                         $('.filters > li > a.selected').removeClass();
                         $('#filter_all').attr('class', 'selected');
@@ -40,8 +39,18 @@
     $(document).on('click', '.toggle', function() {
         var li = $(this).closest('li');
         var li_id = li.attr('id');
-        console.log(li_id);
         var checked = $(this).prop("checked");
+        var currentTap = $('.filters > li > a.selected').attr('id');
+        var filterId;
+
+        //active탭과 complte탭에서 할일 완료나 취소를 할 시 자연스럽게 이동
+        if(currentTap==="filter_all"){
+            filterId=0;
+        }else if(currentTap=="filter_act"){
+            filterId=1;
+        }else{
+            filterId=2;
+        }
 
         if (checked) {
             $.ajax({
@@ -53,13 +62,13 @@
                 success: function(result) {
                     alert("할일을 끝냈습니다.");
                     li.attr('class', 'completed');
+                    filter(filterId);
                     itemLeftCount(); // 갱신
                 }
             }).error(function() {
                 alert('ajax request fail');
             });
         } else {
-
             $.ajax({
                 url: "/api/todos/" + li_id,
                 dataType: "json",
@@ -69,6 +78,7 @@
                 success: function(result) {
                     alert("취소");
                     li.removeClass();
+                    filter(filterId);
                     itemLeftCount(); // 갱신
                 }
             }).error(function() {
@@ -105,8 +115,7 @@
             url: "./api/todos",
             type: "DELETE",
             success: function(result) {
-                // console.log(result); //몇개가 삭제되었는지.
-                if (result == 0) {
+                if (result == 0) {//0개가 삭제
                     alert("완료된 일이 없습니다.");
                 } else {
                     alert("완료된 일 " + result + "개가 삭제되었습니다.");
@@ -123,64 +132,17 @@
 
     //필터링 All
     $("#filter_all").on('click', function() {
-        $('.filters > li > a.selected').removeClass();
-        $('#filter_all').attr('class', 'selected');
-        loadTodoList();
+        filter(0);
     });
+
     //필터링 Active
     $("#filter_act").on('click', function() {
-        $('.filters > li > a.selected').removeClass();
-        $('#filter_act').attr('class', 'selected');
-        $.ajax({
-            url: './api/todos/active',
-            type: 'GET',
-            dataType: 'json',
-            success: function(result) {
-                $(".todo-list").empty();
-                var todos = [];
-                // console.log(result);
-                $.each(result, function(i) {
-                    todos.push("<li id=" + result[i].id + ">" + "<div class='view'><input class='toggle' type='checkbox'>\
-                               <label>" + result[i].todo + "</label><button class='destroy'></button></div></li>");
-
-                });
-                console.log(todos);
-                // $('.todo-list').html(todos);// 왜 안되지?
-                for (var i = 0; i < result.length; i++) {
-                    $('.todo-list').append(todos[i]);
-                }
-            }
-        }).error(function() {
-            alert('ajax request fail');
-        });
+        filter(1);
     });
-    //필터링 Completed
+
+    //필터링 completed
     $("#filter_comple").on('click', function() {
-        $('.filters > li > a.selected').removeClass();
-        $('#filter_comple').attr('class', 'selected');
-        $.ajax({
-            url: './api/todos/completed',
-            type: 'GET',
-            dataType: 'json',
-            success: function(result) {
-                $(".todo-list").empty();
-
-                var todos = [];
-                // console.log(result);
-                $.each(result, function(i) {
-                    todos.push("<li class='completed' id=" + result[i].id + ">" + "<div class='view'><input class='toggle' type='checkbox' checked>\
-                               <label>" + result[i].todo + "</label><button class='destroy'></button></div></li>");
-                });
-                console.log(todos);
-                // $('.todo-list').html(todos);// 왜 안되지?
-                for (var i = 0; i < result.length; i++) {
-                    $('.todo-list').append(todos[i]);
-                }
-            }
-        }).error(function() {
-            alert('ajax request fail');
-        });
-
+        filter(2);
     });
 
 })(window);
@@ -193,7 +155,6 @@ function loadTodoList() {
             type: 'GET',
             dataType: 'json',
             success: function(result) {
-
                 $(".todo-list").empty();
                 var todos = [];
                 // console.log(result);
@@ -211,7 +172,6 @@ function loadTodoList() {
                                <label>" + result[i].todo + "</label><button class='destroy'></button></div></li>");
 
                 });
-                console.log(todos);
                 itemLeftCount();
                 // $('.todo-list').html(todos);// 왜 안되지?
 
@@ -238,91 +198,59 @@ function itemLeftCount() {
     });
 }
 
-// Your starting point. Enjoy the ride!
-// function loadData() {
+function filter(id) {
 
-//     var $body = $('body');
-//     var $wikiElem = $('#wikipedia-links');
-//     var $nytHeaderElem = $('#nytimes-header');
-//     var $nytElem = $('#nytimes-articles');
-//     var $greeting = $('#greeting');
+    if (id == 0) {
+        //필터링 All
+        $('.filters > li > a.selected').removeClass();
+        $('#filter_all').attr('class', 'selected');
+        loadTodoList();
+    } else if (id == 1) {
+        //필터링 Active
+        $('.filters > li > a.selected').removeClass();
+        $('#filter_act').attr('class', 'selected');
+        $.ajax({
+            url: './api/todos/active',
+            type: 'GET',
+            dataType: 'json',
+            success: function(result) {
+                $(".todo-list").empty();
+                var todos = [];
+                $.each(result, function(i) {
+                    todos.push("<li id=" + result[i].id + ">" + "<div class='view'><input class='toggle' type='checkbox'>\
+                               <label>" + result[i].todo + "</label><button class='destroy'></button></div></li>");
 
-//     // clear out old data before new request
-//     $wikiElem.text("");
-//     $nytElem.text("");
+                });
+                for (var i = 0; i < result.length; i++) {
+                    $('.todo-list').append(todos[i]);
+                }
+            }
+        }).error(function() {
+            alert('ajax request fail');
+        });
+    } else {
+        //필터링 Completed
+        $('.filters > li > a.selected').removeClass();
+        $('#filter_comple').attr('class', 'selected');
+        $.ajax({
+            url: './api/todos/completed',
+            type: 'GET',
+            dataType: 'json',
+            success: function(result) {
+                $(".todo-list").empty();
 
-//     // load streetview
-//     var streetStr = $('#street').val();
-//     var cityStr = $('#city').val();
-//     var address = streetStr + ',' + cityStr;
+                var todos = [];
+                $.each(result, function(i) {
+                    todos.push("<li class='completed' id=" + result[i].id + ">" + "<div class='view'><input class='toggle' type='checkbox' checked>\
+                               <label>" + result[i].todo + "</label><button class='destroy'></button></div></li>");
+                });
+                for (var i = 0; i < result.length; i++) {
+                    $('.todo-list').append(todos[i]);
+                }
+            }
+        }).error(function() {
+            alert('ajax request fail');
+        });
+    }
+}
 
-//     $greeting.text('So, you want to live at ' + address + '?');
-
-//     var streetviewUrl = 'http://maps.googleapis.com/maps/api/streetview?size=600x400&location=' + address + '';
-//     $body.append('<img class="bgimg" src="' + streetviewUrl + '">');
-
-
-//     //Your NY Times AJAX request goes here
-//     console.log(cityStr);
-//     var nytimesUrl = 'http://api.nytimes.com/svc/search/v2/articlesearch.json?q=' + cityStr + '&sort=newest&api-key=21edf41b6db744e6ace9642213489d0f'
-//     console.log(nytimesUrl);
-
-//     $.ajax({
-//             url: nytimesUrl,
-//             dataType: 'json', //받는 타입
-//             type: 'GET',
-//             success: function(data) {
-//                 $nytHeaderElem.text('New York Times Articles About ' + cityStr);
-//                 console.log(data);
-//                 articles = data.response.docs;
-//                 for (var i = 0; i < articles.length; i++) {
-//                     var article = articles[i];
-//                     $nytElem.append('<li class="article">' + '<a href="' + article.web_url + '">' + article.headline.main + '</a>' + '<p>' + article.snippet + '</p>' + '</li>');
-//                 }
-//             }
-//         }).error(function(e) {
-//             $nytHeaderElem.text("New york times aricles could not be loaded");
-//         })
-//         // $.getJson(nytimesUrl,function(data){
-//         //     $nytHeaderElem.text('New York Times Articles About ' +cityStr);
-//         //     // console.log(data);
-//         //     articles = data.response.docs;
-//         //     for(var i=0;i<articles.length;i++){
-//         //         var article=articles[i];
-//         //         $nytElem.append('<li class="article">'+'<a href="'+article.web_url+'">'+article.headline.main+'</a>'+'<p>'+article.snippet+'</p>'+'</li>');
-//         //     }
-//         // });
-
-//     var wikiRequestTimeout = setTimeout(function() {
-//         $wikiElem.text('failed to get wikipedia resources');
-
-//     }, 8000);
-
-//     //Wikipedia Ajax request goes here
-//     var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch$search=' + cityStr + '&format=json&callback=wikiCallback';
-//     console.log(wikiUrl);
-//     $.ajax({
-//         url: wikiUrl,
-//         dataType: 'jsonp',
-//         type: 'GET',
-//         //jsonp:''callback",
-//         success: function(response) {
-//             console.log(response);
-//             var articleList = response[1];
-//             console.log(articleList);
-//             for (var i = 0; i < articleList.length; i++) {
-//                 articleStr = articleList[i];
-//                 var url = 'http://en.wikipedia.org/wiki/' + articleStr;
-//                 console.log(url);
-//                 // $wikiElem.append('<li><a href="' + url+ '">'+articleStr+<'</a></li>');
-//             };
-//             clearTimeout(wikiRequestTimeout);
-//         }
-//     });
-
-//     // YOUR CODE GOES HERE!
-
-//     return false;
-// }
-
-// $('#form-container').submit(loadData);
