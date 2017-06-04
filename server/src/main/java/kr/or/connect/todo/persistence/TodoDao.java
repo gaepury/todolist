@@ -25,7 +25,8 @@ public class TodoDao {
 
 	public TodoDao(DataSource dataSource) {
 		this.jdbc = new NamedParameterJdbcTemplate(dataSource);
-		this.insertAction = new SimpleJdbcInsert(dataSource).withTableName("todo").usingColumns("todo").usingGeneratedKeyColumns("id"); //usingColumns를 쓰는 이유는?
+		this.insertAction = new SimpleJdbcInsert(dataSource).withTableName("todo").usingColumns("todo")
+				.usingGeneratedKeyColumns("id"); // usingColumns를 쓰는 이유는?
 	}
 
 	// 할일 갯수
@@ -38,6 +39,18 @@ public class TodoDao {
 	public List<Todo> selectAll() {
 		Map<String, Object> params = Collections.emptyMap();
 		return jdbc.query(TodoSqls.SELECT_ALL, params, rowMapper);
+	}
+
+	// 진행중인 할일 리스트
+	public List<Todo> selectActive() {
+		Map<String, Object> params = Collections.emptyMap();
+		return jdbc.query(TodoSqls.SELECT_ACTIVE, params, rowMapper);
+	}
+
+	// 완료된 일 리스트
+	public List<Todo> selectCompleted() {
+		Map<String, Object> params = Collections.emptyMap();
+		return jdbc.query(TodoSqls.SELECT_COMPLETED, params, rowMapper);
 	}
 
 	// 해당 id의 할일
@@ -65,10 +78,10 @@ public class TodoDao {
 		Map<String, ?> params = Collections.singletonMap("id", id);
 		return jdbc.update(TodoSqls.DELETE_BY_ID, params);
 	}
-	
+
 	// 완료된 일 삭제
 	public Integer deleteByCompleted() {
 		Map<String, Object> params = Collections.emptyMap();
-		return jdbc.update(TodoSqls.DELETE_BY_COMPLETED,params);
+		return jdbc.update(TodoSqls.DELETE_BY_COMPLETED, params);
 	}
 }

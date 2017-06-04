@@ -64,7 +64,7 @@
                 if (data == 0) {
                     alert("완료된 일이 없습니다.");
                 } else {
-                    alert("완료된 일 "+data +"개가 삭제되었습니다.");
+                    alert("완료된 일 " + data + "개가 삭제되었습니다.");
                     loadTodoList();
                     itemLeftCount();
                 }
@@ -72,7 +72,69 @@
 
             }
         })
-    })
+    });
+
+    //필터링 All
+    $("#filter_all").on('click', function() {
+        $('.filters > li > a.selected').removeClass();
+        $('#filter_all').attr('class', 'selected');
+        loadTodoList();
+    });
+    $("#filter_act").on('click', function() {
+        $('.filters > li > a.selected').removeClass();
+        $('#filter_act').attr('class', 'selected');
+        $.ajax({
+            url: './api/todos/active',
+            type: 'GET',
+            dataType: 'json',
+            success: function(result) {
+                $(".todo-list").empty();
+                var todos = [];
+                // console.log(result);
+                $.each(result, function(i) {
+                    todos.push("<li id=" + result[i].id + ">" + "<div class='view'><input class='toggle' type='checkbox'>\
+                               <label>" + result[i].todo + "</label><button class='destroy'></button></div></li>");
+
+                });
+                console.log(todos);
+                // $('.todo-list').html(todos);// 왜 안되지?
+
+                for (var i = 0; i < result.length; i++) {
+                    $('.todo-list').append(todos[i]);
+                }
+            }
+        }).error(function() {
+            alert('ajax request fail');
+        });
+    });
+    //필터링 Completed
+    $("#filter_comple").on('click', function() {
+        $('.filters > li > a.selected').removeClass();
+        $('#filter_comple').attr('class', 'selected');
+        $.ajax({
+            url: './api/todos/completed',
+            type: 'GET',
+            dataType: 'json',
+            success: function(result) {
+                $(".todo-list").empty();
+                var todos = [];
+                // console.log(result);
+                $.each(result, function(i) {
+                    todos.push("<li class='completed' id=" + result[i].id + ">" + "<div class='view'><input class='toggle' type='checkbox' checked>\
+                               <label>" + result[i].todo + "</label><button class='destroy'></button></div></li>");
+                });
+                console.log(todos);
+                // $('.todo-list').html(todos);// 왜 안되지?
+
+                for (var i = 0; i < result.length; i++) {
+                    $('.todo-list').append(todos[i]);
+                }
+            }
+        }).error(function() {
+            alert('ajax request fail');
+        });
+
+    });
 
 })(window);
 
@@ -97,7 +159,7 @@ function loadTodoList() {
                         check = 'checked';
                     }
 
-                    todos.push("<li "+className+" id=" + result[i].id + ">" + "<div class='view'><input class='toggle' type='checkbox'" + checked + ">\
+                    todos.push("<li " + className + " id=" + result[i].id + ">" + "<div class='view'><input class='toggle' type='checkbox'" + checked + ">\
                                <label>" + result[i].todo + "</label><button class='destroy'></button></div></li>");
 
                 });
@@ -125,6 +187,7 @@ function itemLeftCount() {
         }
     })
 }
+
 // Your starting point. Enjoy the ride!
 // function loadData() {
 
