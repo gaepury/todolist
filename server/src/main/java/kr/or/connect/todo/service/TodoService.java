@@ -15,34 +15,35 @@ public class TodoService {
 		this.dao = dao;
 	}
 	
+	//할일 갯수
 	public Integer countTodo(){
 		return dao.countTodos();
 	}
 	
+
 	public Todo findById(Integer id) {
 		return dao.selectById(id);
 	}
-
+	//모든 할일 리스트
 	public Collection<Todo> findAll() {
 		return dao.selectAll();
 	}
-
+	//할일 등록
 	public Todo create(Todo Todo) {
 		Integer id = dao.insert(Todo);
 		Todo.setId(id);
 		return Todo;
 	}
-
 	public boolean update(Todo Todo) {
 		int affected = dao.update(Todo);
 		return affected == 1;
 	}
-
+	//할일 삭제
 	public boolean delete(Integer id) {
 		int affected = dao.deleteById(id);
 		return affected == 1;
 	}
-	
+	//완료된 일 삭제
 	public Integer deleteByCompleted() {
 		return dao.deleteByCompleted();
 	}

@@ -29,21 +29,22 @@ public class TodoController {
 	public TodoController(TodoService service) {
 		this.service = service;
 	}
+	//할일 갯수
 	@GetMapping("/count")
 	Integer countList(){
 		return service.countTodo();
 	}
-	
+	//모든 할일
 	@GetMapping
 	Collection<Todo> readList() {
 		return service.findAll();
 	}
-
 	@GetMapping("/{id}")
 	Todo read(@PathVariable Integer id) {
 		return service.findById(id);
 	}
-
+	
+	//할일 등록
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	Todo create(@RequestBody Todo todo) {
@@ -51,6 +52,7 @@ public class TodoController {
 		return service.create(todo);
 	}
 
+	//할일 수정
 	@PutMapping("/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	void update(@PathVariable Integer id, @RequestBody Todo todo) {
@@ -58,12 +60,14 @@ public class TodoController {
 		service.update(todo);
 	}
 
+	//버튼 클릭시 할일 삭제
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	void delete(@PathVariable Integer id) {
 		service.delete(id);
 	}
 	
+	//완료된 일 삭제
 	@DeleteMapping
 	Integer deleteByCompleted() {
 		return service.deleteByCompleted();
