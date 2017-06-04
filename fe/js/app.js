@@ -65,6 +65,8 @@
                     alert("완료된 일이 없습니다.");
                 } else {
                     alert("완료된 일 " + data + "개가 삭제되었습니다.");
+                    $('.filters > li > a.selected').removeClass();
+                    $('#filter_all').attr('class', 'selected');
                     loadTodoList();
                     itemLeftCount();
                 }
