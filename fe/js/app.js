@@ -52,6 +52,28 @@
     });
 
 
+    //완료된 일 삭제하기
+    $(".clear-completed").on('click', function() {
+        $.ajax({
+            url: "./api/todos",
+            type: "DELETE",
+
+            success: function(data) {
+                // console.log(data);
+
+                if (data == 0) {
+                    alert("완료된 일이 없습니다.");
+                } else {
+                    alert("완료된 일 "+data +"개가 삭제되었습니다.");
+                    loadTodoList();
+                    itemLeftCount();
+                }
+
+
+            }
+        })
+    })
+
 
 
 })(window);
@@ -77,11 +99,11 @@ function loadTodoList() {
                         check = 'checked';
                     }
 
-                    todos.push("<li" +className + " id=" + result[i].id + ">" + "<div class='view'><input class='toggle' type='checkbox'" + checked + ">\
+                    todos.push("<li" + className + " id=" + result[i].id + ">" + "<div class='view'><input class='toggle' type='checkbox'" + checked + ">\
                                <label>" + result[i].todo + "</label><button class='destroy'></button></div></li>");
 
                 });
-                // console.log(todos);
+                console.log(todos);
                 itemLeftCount();
                 // $('.todo-list').html(todos);// 왜 안되지?
 

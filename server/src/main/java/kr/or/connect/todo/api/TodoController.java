@@ -63,5 +63,10 @@ public class TodoController {
 	void delete(@PathVariable Integer id) {
 		service.delete(id);
 	}
+	
+	@DeleteMapping
+	Integer deleteByCompleted() {
+		return service.deleteByCompleted();
+	}
 
 }

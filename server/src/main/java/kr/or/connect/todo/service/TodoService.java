@@ -42,6 +42,10 @@ public class TodoService {
 		int affected = dao.deleteById(id);
 		return affected == 1;
 	}
+	
+	public Integer deleteByCompleted() {
+		return dao.deleteByCompleted();
+	}
 //	private ConcurrentMap<Integer, Todo> repo = new ConcurrentHashMap<>();
 //	private AtomicInteger maxId = new AtomicInteger(0);
 //	

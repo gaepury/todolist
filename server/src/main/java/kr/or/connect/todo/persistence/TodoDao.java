@@ -65,5 +65,10 @@ public class TodoDao {
 		Map<String, ?> params = Collections.singletonMap("id", id);
 		return jdbc.update(TodoSqls.DELETE_BY_ID, params);
 	}
-
+	
+	// 완료된 일 삭제
+	public Integer deleteByCompleted() {
+		Map<String, Object> params = Collections.emptyMap();
+		return jdbc.update(TodoSqls.DELETE_BY_COMPLETED,params);
+	}
 }
