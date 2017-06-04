@@ -19,11 +19,15 @@
                     data: JSON.stringify({ "todo": todo }), //DB에서 completed 기본값 0, date 기본값 현재 시간
                     success: function(result) {
                         // alert(result.id);
+                        //complete탭에서 추가할때 생기는걸 방지하기 위해 all페이지로 이동후 추가되게 함
+                        loadTodoList();
+                        $('.filters > li > a.selected').removeClass();
+                        $('#filter_all').attr('class', 'selected');
+
                         alert("할일이 추가되었습니다.");
                         $('.todo-list').prepend("<li id='" + result.id + "'>" + '<div class="view">' + '<input class="toggle" type="checkbox">' + '<label>' + todo + '</label>' + '<button class="destroy"></button>' + '</div>' + '</li>');
                         itemLeftCount(); // 갱신
                     }
-
                 }).error(function() {
                     alert('error');
                 });
@@ -31,6 +35,47 @@
             }
         }
     });
+
+    //할일 완료하기
+    $(document).on('click', '.toggle', function() {
+        var li = $(this).closest('li');
+        var li_id = li.attr('id');
+        console.log(li_id);
+        var checked = $(this).prop("checked");
+
+        if (checked) {
+            $.ajax({
+                url: "/api/todos/" + li_id,
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                type: "PUT",
+                data: JSON.stringify({ "completed": 1 }),
+                success: function(result) {
+                    alert("할일을 끝냈습니다.");
+                    li.attr('class', 'completed');
+                    itemLeftCount(); // 갱신
+                }
+            }).error(function() {
+                alert('ajax request fail');
+            });
+        } else {
+
+            $.ajax({
+                url: "/api/todos/" + li_id,
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                type: "PUT",
+                data: JSON.stringify({ "completed": 0 }),
+                success: function(result) {
+                    alert("취소");
+                    li.removeClass();
+                    itemLeftCount(); // 갱신
+                }
+            }).error(function() {
+                alert('ajax request fail');
+            });
+        }
+    })
 
     //할 일 삭제하기
     //이벤트 위임 방식 
@@ -42,38 +87,38 @@
         $.ajax({
             url: "/api/todos/" + li_id,
             type: "DELETE",
-
             success: function(result) {
                 alert("할일이 삭제되었습니다.");
                 li.remove();
                 itemLeftCount(); // 갱신
             }
+        }).error(function() {
+            alert('ajax request fail');
         });
     });
 
 
     //완료된 일 삭제하기
+    //삭제시 UI를 고려하여 ALL탭으로 자동 이동
     $(".clear-completed").on('click', function() {
         $.ajax({
             url: "./api/todos",
             type: "DELETE",
-
-            success: function(data) {
-                // console.log(data); //몇개가 삭제되었는지.
-
-                if (data == 0) {
+            success: function(result) {
+                // console.log(result); //몇개가 삭제되었는지.
+                if (result == 0) {
                     alert("완료된 일이 없습니다.");
                 } else {
-                    alert("완료된 일 " + data + "개가 삭제되었습니다.");
+                    alert("완료된 일 " + result + "개가 삭제되었습니다.");
                     $('.filters > li > a.selected').removeClass();
                     $('#filter_all').attr('class', 'selected');
                     loadTodoList();
                     itemLeftCount();
                 }
-
-
             }
-        })
+        }).error(function() {
+            alert('ajax request fail');
+        });
     });
 
     //필터링 All
@@ -82,6 +127,7 @@
         $('#filter_all').attr('class', 'selected');
         loadTodoList();
     });
+    //필터링 Active
     $("#filter_act").on('click', function() {
         $('.filters > li > a.selected').removeClass();
         $('#filter_act').attr('class', 'selected');
@@ -100,7 +146,6 @@
                 });
                 console.log(todos);
                 // $('.todo-list').html(todos);// 왜 안되지?
-
                 for (var i = 0; i < result.length; i++) {
                     $('.todo-list').append(todos[i]);
                 }
@@ -119,6 +164,7 @@
             dataType: 'json',
             success: function(result) {
                 $(".todo-list").empty();
+
                 var todos = [];
                 // console.log(result);
                 $.each(result, function(i) {
@@ -127,7 +173,6 @@
                 });
                 console.log(todos);
                 // $('.todo-list').html(todos);// 왜 안되지?
-
                 for (var i = 0; i < result.length; i++) {
                     $('.todo-list').append(todos[i]);
                 }
@@ -148,6 +193,7 @@ function loadTodoList() {
             type: 'GET',
             dataType: 'json',
             success: function(result) {
+
                 $(".todo-list").empty();
                 var todos = [];
                 // console.log(result);
@@ -158,7 +204,7 @@ function loadTodoList() {
                     // console.log(result[i].id);
                     if (result[i].completed == 1) {
                         className = 'class = completed';
-                        check = 'checked';
+                        checked = 'checked';
                     }
 
                     todos.push("<li " + className + " id=" + result[i].id + ">" + "<div class='view'><input class='toggle' type='checkbox'" + checked + ">\
@@ -179,7 +225,7 @@ function loadTodoList() {
     });
 }
 
-//
+//할일 갯수 카운트
 function itemLeftCount() {
     $.ajax({
         url: './api/todos/count',
@@ -187,7 +233,9 @@ function itemLeftCount() {
         success: function(result) {
             $('.todo-count strong').text(result);
         }
-    })
+    }).error(function() {
+        alert('ajax request fail');
+    });
 }
 
 // Your starting point. Enjoy the ride!
