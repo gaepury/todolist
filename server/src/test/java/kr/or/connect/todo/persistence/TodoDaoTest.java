@@ -66,7 +66,7 @@ public class TodoDaoTest { //쿼리를 날리기 위한 객체.
 		// Then
 		assertThat(affected, is(1));
 		Todo updated = dao.selectById(id);
-		assertThat(updated.getTodo(), is("jquery 공부"));
+		assertThat(updated.getCompleted(), is(1));
 	}
 	@Test
 	public void shouldSelectAll() {
