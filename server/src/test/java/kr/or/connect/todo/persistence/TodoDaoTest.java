@@ -60,13 +60,13 @@ public class TodoDaoTest { //쿼리를 날리기 위한 객체.
 
 		// When
 		Todo.setId(id);
-		Todo.setTodo("javascript 공부");
+		Todo.setCompleted(1);
 		int affected = dao.update(Todo);
 
 		// Then
 		assertThat(affected, is(1));
 		Todo updated = dao.selectById(id);
-		assertThat(updated.getTodo(), is("javascript 공부"));
+		assertThat(updated.getTodo(), is("jquery 공부"));
 	}
 	@Test
 	public void shouldSelectAll() {
