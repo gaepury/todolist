@@ -1,5 +1,5 @@
-package kr.or.connect.todo.domain;
 
+package kr.or.connect.todo.domain;
 import java.util.Date;
 
 public class Todo {

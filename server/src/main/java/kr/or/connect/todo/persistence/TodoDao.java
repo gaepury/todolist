@@ -55,13 +55,13 @@ public class TodoDao {
 	}
 
 	// 할일 수정
-	public int update(Todo Todo) {
+	public Integer update(Todo Todo) {
 		SqlParameterSource params = new BeanPropertySqlParameterSource(Todo);
 		return jdbc.update(TodoSqls.UPDATE, params);
 	}
 
 	// 할일 삭제
-	public int deleteById(Integer id) {
+	public Integer deleteById(Integer id) {
 		Map<String, ?> params = Collections.singletonMap("id", id);
 		return jdbc.update(TodoSqls.DELETE_BY_ID, params);
 	}

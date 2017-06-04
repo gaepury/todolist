@@ -2,80 +2,108 @@
     'use strict';
 
     //할 일 리스트 로드
-    loadPage();
+    loadTodoList();
 
-    
-    //할 일 추가
+    //할 일 등록
     $(".new-todo").keypress(function(event) {
-        if (event.which == 13) {
+        if (event.keyCode == 13) {
             var todo = $(this).val();
             if (todo == "") {
-                alert("문자를 입력하세요.(빈문자X)");
+                alert("내용을 입력하세요.");
             } else {
                 $.ajax({
                     url: "./api/todos",
                     dataType: "json",
                     contentType: "application/json; charset=UTF-8",
                     type: 'POST',
-                    data: JSON.stringify({"todo": todo}), //DB에서 completed 기본값 0, date 기본값 현재 시간
-
+                    data: JSON.stringify({ "todo": todo }), //DB에서 completed 기본값 0, date 기본값 현재 시간
                     success: function(result) {
-                        alert(result.id);
+                        // alert(result.id);
                         alert("할일이 추가되었습니다.");
-                        
                         $('.todo-list').prepend("<li id='" + result.id + "'>" + '<div class="view">' + '<input class="toggle" type="checkbox">' + '<label>' + todo + '</label>' + '<button class="destroy"></button>' + '</div>' + '</li>');
+                        itemLeftCount(); // 갱신
                     }
+
                 }).error(function() {
                     alert('error');
                 });
-
                 $('.new-todo').val("");
             }
-
         }
-
     });
+
+    //할 일 삭제하기
+    //이벤트 위임 방식 
+    $(document).on('click', ".destroy", function() {
+        var li = $(this).closest('li');
+        var li_id = li.attr('id');
+
+        //클릭한 메모의 Id값을 구함
+        $.ajax({
+            url: "/api/todos/" + li_id,
+            type: "DELETE",
+
+            success: function(result) {
+                alert("할일이 삭제되었습니다.");
+                li.remove();
+                itemLeftCount(); // 갱신
+            }
+        });
+    });
+
+
+
 
 })(window);
 
-
-function loadPage(){
+//할 일 리스트 로드 함수
+function loadTodoList() {
     $(document).ready(function() {
         $.ajax({
             url: './api/todos',
             type: 'GET',
             dataType: 'json',
-            success: function(data) {
+            success: function(result) {
+                $(".todo-list").empty();
                 var todos = [];
-                var itemleftCount = 0;
-                console.log(data);
-                $.each(data, function(i) {
+                // console.log(result);
+                $.each(result, function(i) {
                     var checked = '';
                     var className = '';
-                    console.log(i);
-                    console.log(data[i].id);
-
-                    if (data[i].completed == 1) {
-                        className = 'completed';
+                    // console.log(i);
+                    // console.log(result[i].id);
+                    if (result[i].completed == 1) {
+                        className = 'class = completed';
                         check = 'checked';
-                    } else {
-                        itemleftCount++;
                     }
-                    todos.push("<li class=" + className + "id=" + data[i].id + ">" + "<div class='view'><input class='toggle' type='checkbox'" + checked + ">\
-                               <label>" + data[i].todo + "</label><button class='destroy'></button></div></li>");
+
+                    todos.push("<li" +className + " id=" + result[i].id + ">" + "<div class='view'><input class='toggle' type='checkbox'" + checked + ">\
+                               <label>" + result[i].todo + "</label><button class='destroy'></button></div></li>");
 
                 });
-                 // $('.todo-list').html(todos);// 왜 안되지?
+                // console.log(todos);
+                itemLeftCount();
+                // $('.todo-list').html(todos);// 왜 안되지?
 
-                for (var i = 0; i < data.length; i++) {
-                    $('.todo-list').append(todos[i]);  
+                for (var i = 0; i < result.length; i++) {
+                    $('.todo-list').append(todos[i]);
                 }
-                $('.todo-count > strong').text(itemleftCount);
             }
-        }).error(function(){
+        }).error(function() {
             alert('ajax request fail');
         });
     });
+}
+
+//
+function itemLeftCount() {
+    $.ajax({
+        url: './api/todos/count',
+        type: "GET",
+        success: function(result) {
+            $('.todo-count strong').text(result);
+        }
+    })
 }
 // Your starting point. Enjoy the ride!
 // function loadData() {

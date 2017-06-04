@@ -14,7 +14,11 @@ public class TodoService {
 	public TodoService(TodoDao dao) {
 		this.dao = dao;
 	}
-
+	
+	public Integer countTodo(){
+		return dao.countTodos();
+	}
+	
 	public Todo findById(Integer id) {
 		return dao.selectById(id);
 	}

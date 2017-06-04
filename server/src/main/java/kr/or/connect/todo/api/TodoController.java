@@ -29,7 +29,11 @@ public class TodoController {
 	public TodoController(TodoService service) {
 		this.service = service;
 	}
-
+	@GetMapping("/count")
+	Integer countList(){
+		return service.countTodo();
+	}
+	
 	@GetMapping
 	Collection<Todo> readList() {
 		return service.findAll();
@@ -43,6 +47,7 @@ public class TodoController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	Todo create(@RequestBody Todo todo) {
+		
 		return service.create(todo);
 	}
 
