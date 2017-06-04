@@ -12,23 +12,22 @@
                 alert("내용을 입력하세요.");
             } else {
                 $.ajax({
-                    url: "./api/todos",
+                    url: "/api/todos",
                     dataType: "json",
                     contentType: "application/json; charset=UTF-8",
                     type: 'POST',
                     data: JSON.stringify({ "todo": todo }), //DB에서 completed 기본값 0, date 기본값 현재 시간
                     success: function(result) {
-
-                        loadTodoList();
                         $('.filters > li > a.selected').removeClass();
                         $('#filter_all').attr('class', 'selected');
+                        loadTodoList();
 
                         alert("할일이 추가되었습니다.");
                         $('.todo-list').prepend("<li id='" + result.id + "'>" + '<div class="view">' + '<input class="toggle" type="checkbox">' + '<label>' + todo + '</label>' + '<button class="destroy"></button>' + '</div>' + '</li>');
                         itemLeftCount(); // 갱신
                     }
                 }).error(function() {
-                    alert('error');
+                    alert('ajax request fail');
                 });
                 $('.new-todo').val("");
             }
@@ -62,7 +61,7 @@
                 success: function(result) {
                     alert("할일을 끝냈습니다.");
                     li.attr('class', 'completed');
-                    filter(filterId);
+                    filter(filterId);//탭 구분
                     itemLeftCount(); // 갱신
                 }
             }).error(function() {
@@ -78,7 +77,7 @@
                 success: function(result) {
                     alert("취소");
                     li.removeClass();
-                    filter(filterId);
+                    filter(filterId); //탭 구분
                     itemLeftCount(); // 갱신
                 }
             }).error(function() {
@@ -112,7 +111,7 @@
     //삭제시 UI를 고려하여 ALL탭으로 자동 이동
     $(".clear-completed").on('click', function() {
         $.ajax({
-            url: "./api/todos",
+            url: "/api/todos",
             type: "DELETE",
             success: function(result) {
                 if (result == 0) {//0개가 삭제
@@ -151,7 +150,7 @@
 function loadTodoList() {
     $(document).ready(function() {
         $.ajax({
-            url: './api/todos',
+            url: '/api/todos',
             type: 'GET',
             dataType: 'json',
             success: function(result) {
@@ -188,7 +187,7 @@ function loadTodoList() {
 //할일 갯수 카운트
 function itemLeftCount() {
     $.ajax({
-        url: './api/todos/count',
+        url: '/api/todos/count',
         type: "GET",
         success: function(result) {
             $('.todo-count strong').text(result);
@@ -210,7 +209,7 @@ function filter(id) {
         $('.filters > li > a.selected').removeClass();
         $('#filter_act').attr('class', 'selected');
         $.ajax({
-            url: './api/todos/active',
+            url: '/api/todos/active',
             type: 'GET',
             dataType: 'json',
             success: function(result) {
@@ -233,7 +232,7 @@ function filter(id) {
         $('.filters > li > a.selected').removeClass();
         $('#filter_comple').attr('class', 'selected');
         $.ajax({
-            url: './api/todos/completed',
+            url: '/api/todos/completed',
             type: 'GET',
             dataType: 'json',
             success: function(result) {
